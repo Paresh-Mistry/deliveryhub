@@ -1,23 +1,29 @@
 "use client"
 
 import OrderCard from "@component/components/admin/OrderCard";
+import { Order } from "@component/types";
 import { ListCheck, Plus } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import useSWR from "swr";
+import { orbitron } from "../layout";
 
-type Order = {
-  orderId: string;
-  customerName: string;
-  address: string;
-  partnerName?: string | null;
-  status: string;
-};
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 export default function Page() {
 
+    const {
+        data: orders,
+        mutate,
+        error
+    } = useSWR<Order[]>("/api/orders", fetcher);
+
+
+    console.log(orders)
+
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState("");
-    const [orders, setOrders] = useState<Order[]>([]);
 
     const openModal = () => setIsOpen(true);
     const closeModal = () => {
@@ -28,32 +34,34 @@ export default function Page() {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
+        const partnerName = formData.get("partner");
 
         const newOrder: Order = {
-            orderId: formData.get("orderId") as string,
+            _id: uuidv4(),
             customerName: formData.get("customerName") as string,
             address: formData.get("address") as string,
-            partnerName: formData.get("partnerName") as string || null,
+            partner: partnerName ? (partnerName as string) : null,
             status: formData.get("status") as string,
         };
 
         try {
             const res = await axios.post("/api/orders", newOrder);
 
-            if (res.status === 201) {
-                setOrders(prev => [...prev, newOrder]);
+            if (res.status === 200 || res.status === 201) {
+                // Update SWR cache with new order
+                mutate([...orders!, newOrder], false);
                 setMessage("Order created successfully!");
                 e.target.reset();
+                setTimeout(closeModal, 1000);
             }
         } catch (error: any) {
             console.error(error);
-            if (error.response) {
-                setMessage(error.response.data.message || "Failed to create order.");
-            } else {
-                setMessage("Server error. Try again later.");
-            }
+            setMessage(error.response?.data?.message || "Server error. Try again later.");
         }
     };
+
+    if (!orders) return <p>Loading orders...</p>;
+    if (error) return <p>Error while Loading orders...</p>;
 
     return (
         <>
@@ -61,7 +69,7 @@ export default function Page() {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <ListCheck />
-                        <h1 className="text-3xl font-semibold">Order</h1>
+                        <h1 className={`text-3xl font-semibold ${orbitron.className}`}>Orders</h1>
                     </div>
                     <div>
                         <button
@@ -72,34 +80,19 @@ export default function Page() {
                         </button>
                     </div>
                 </div>
+
                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    {orders.map((o) => (
-                        <OrderCard
-                            key={o.orderId}
-                            orderId={o.orderId}
-                            customerName={o.customerName}
-                            partnerName={o.partnerName || ""}
-                            status={o.status}
-                        />
-                    ))}
+                    {/* Pass all orders array to OrderCard */}
+                    <OrderCard orders={orders} />
                 </div>
             </div>
 
             {isOpen && (
-                <div className="fixed inset-0 backdrop-saturate-150 backdrop-blur-md flex justify-center items-center z-50">
+                <div className="fixed inset-0 backdrop-blur-md flex justify-center items-center z-50">
                     <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
                         <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
                         {message && <p className="mb-2 text-green-500">{message}</p>}
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block mb-1 font-medium">Order ID</label>
-                                <input
-                                    type="text"
-                                    name="orderId"
-                                    required
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                />
-                            </div>
                             <div>
                                 <label className="block mb-1 font-medium">Customer Name</label>
                                 <input
@@ -122,7 +115,7 @@ export default function Page() {
                                 <label className="block mb-1 font-medium">Partner Name</label>
                                 <input
                                     type="text"
-                                    name="partnerName"
+                                    name="partner"
                                     className="w-full border border-gray-300 rounded px-3 py-2"
                                 />
                             </div>
@@ -158,5 +151,5 @@ export default function Page() {
                 </div>
             )}
         </>
-    )
+    );
 }

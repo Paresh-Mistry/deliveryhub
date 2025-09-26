@@ -6,6 +6,7 @@ import Navbar from "@component/components/common/Navbar";
 import { useState } from "react";
 
 import { Orbitron } from 'next/font/google'
+import { usePartner } from "../context/authContext";
 const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" })
 
 
@@ -35,6 +36,8 @@ const SidebarLink = ({
 
 export default function Sidebarlayout({ children }: { children: React.ReactNode }) {
     const [isOpen, setIsOpen] = useState(false);
+
+    const {partner} = usePartner()
 
     return (
         <>
@@ -73,7 +76,7 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
                         </div>}
 
                         <nav className="mt-3 space-y-1">
-                            <SidebarLink icon={<Tag />} label="Products " isOpen={isOpen} href={'/dashboard/partner'} />
+                            <SidebarLink icon={<Tag />} label="Assignment " isOpen={isOpen} href={'/dashboard/partner'} />
                             <SidebarLink icon={<Settings />} label="Settings" isOpen={isOpen} href={'/dashboard/settings'} />
                         </nav>
                     </div>
@@ -82,9 +85,13 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
 
                 {/* Main Content */}
                 <section className="bg-gray-50 md:px-8 px-4 py-4 md:py-5">
-                    <div className="flex justify-between items-center">
-                        <Link href={''} className="md:block hidden border border-blue-300 px-2 rounded-2xl text-xs py-1">SignIn</Link>
-                    </div>
+                    <div className="flex justify-end items-center">
+ {
+                            partner ?
+                                <span>{partner.split(",")[0]}</span>
+                                :
+                                <Link href={'/auth'} className="font-semi-bold text-sm">Sign in</Link>
+                        }                    </div>
 
                     <div className="mt-4">
                         {children}

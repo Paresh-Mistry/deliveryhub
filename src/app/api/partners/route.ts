@@ -6,11 +6,11 @@ export async function GET() {
     const client = await clientPromise;
     const db = client.db(dbName);
 
-    const orders = await db.collection("orders").find({}).toArray();
+    const partners = await db.collection("partners").find({}).toArray();
 
-    return NextResponse.json(orders);
+    return NextResponse.json(partners);
   } catch (error: any) {
-    console.error("Error fetching orders:", error);
+    console.error("Error fetching partners:", error);
     return NextResponse.json(
       { success: false, error: error?.message || "Unknown error", database: dbName },
       { status: 500 }
@@ -24,22 +24,23 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db(dbName);
 
-    const newOrder = {
-      customerName: body.customerName,
-      address: body.address,
-      partner: body.partner,
-      statusHistory: [{ status: "pending", updatedAt: new Date() }],
+    const newPartner = {
+      PartnerName: body.partnerName,
+      emailId: body.emailId,
+      contactNo: body.contactNo,
+      role: body.role,
+      vehicleType: body.vehicleType || "Two Wheeler",
       createdAt: new Date(),
     };
 
-    const result = await db.collection("orders").insertOne(newOrder);
+    const result = await db.collection("partners").insertOne(newPartner);
 
-    return NextResponse.json({ success: true, orderId: result.insertedId });
+    return NextResponse.json({ success: true, partnerId: result.insertedId });
   } catch (error: any) {
-    console.error("Error creating order:", error);
+    console.error("Error Adding Partner:", error);
     return NextResponse.json(
       { success: false, error: error?.message || "Unknown error" },
-      { status: 500 }
+      { status: 500 }   
     );
   }
 }

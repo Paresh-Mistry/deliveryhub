@@ -3,6 +3,8 @@
 import Hero from "@component/components/common/Hero";
 
 export default function Home() {
+
+  
   return (
     <>
       <Hero />

@@ -8,8 +8,8 @@ import image from "../../../public/globe.svg"
 
 import { Orbitron } from 'next/font/google'
 import Image from "next/image";
-const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" })
 
+export const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" })
 
 const SidebarLink = ({
     href,

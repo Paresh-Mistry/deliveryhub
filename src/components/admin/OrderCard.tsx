@@ -1,9 +1,10 @@
+// components/OrderCard.tsx
 import { ArrowUpRight } from "lucide-react";
+import type { Order } from "../../types/index"
+import Link from "next/link";
 
-
-export default function OrderCard(
-    { orderId, partnerName, status }: { orderId: string, partnerName: string, status: string }) {
-    const getStatusClasses = () => {
+export default function OrderCard({ orders }: { orders: Order[] }) {
+    const getStatusClasses = (status: string) => {
         switch (status) {
             case "pending":
                 return "bg-yellow-100 text-yellow-800";
@@ -19,22 +20,27 @@ export default function OrderCard(
     };
 
     return (
-        <div className="p-4 rounded-xl shadow bg-white hover:shadow-lg transition">
-            <h2 className="text-lg font-semibold mb-2">Order #{orderId}</h2>
-            <p className="text-sm text-gray-700 mb-4">
-                <span className="font-medium">Partner:</span>{" "}
-                {partnerName || "Not Assigned"}
-            </p>
-            <div className="flex justify-between items-center">
-                <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusClasses()}`}
+        <>
+            {orders.map(order => (
+                <div
+                    key={order._id}
+                    className="p-4 rounded-xl shadow bg-white hover:shadow-lg transition mb-4"
                 >
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                </span>
-                <span>
-                    <ArrowUpRight />
-                </span>
-            </div>
-        </div>
+                    <h2 className="text-sm mb-2">
+                        Order #{order._id}
+                    </h2>
+                    <p className="text-sm text-gray-700 mb-4">
+                        <span className="font-medium">Partner:</span>{" "}
+                        {order.partner || "Not Assigned"}
+                    </p>
+                    <div className="flex justify-between items-center">
+                        <span className={`text-sm px-2 rounded-2xl ${getStatusClasses(order.statusHistory?.at(-1)['status'])}`}>{order.statusHistory?.at(-1)['status'] || "Not Assigned"}</span>
+                        <Link href={`/admin/order/${order._id}`}>
+                            <ArrowUpRight />
+                        </Link>
+                    </div>
+                </div>
+            ))}
+        </>
     );
 }

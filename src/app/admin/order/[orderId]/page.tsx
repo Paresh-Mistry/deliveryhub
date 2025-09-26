@@ -1,0 +1,143 @@
+"use client";
+
+import { useState } from "react";
+import useSWR from "swr";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { orbitron } from "../../layout";
+import { Edit, ListCheck, Trash } from "lucide-react";
+import { Order } from "../../../../types/index"
+import OrderTracking from "@component/components/admin/OrderTracking";
+
+
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
+
+interface Props {
+  params: { orderId: string };
+}
+
+export default function AdminOrderPage({ params }: Props) {
+  const { orderId } = params;
+  const router = useRouter();
+  const { data: order, mutate } = useSWR<Order>(`/api/orders/${orderId}`, fetcher);
+
+  const [status, setStatus] = useState(order?.status);
+  const [partner, setPartner] = useState(order?.partner);
+
+  if (!order) return <p>Loading...</p>;
+
+  const handleUpdate = async () => {
+    try {
+      const res = await axios.put(`/api/orders/${orderId}`, { status, partner });
+      mutate(res.data, false);
+      alert("Order updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update order.");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete tdis order?")) return;
+    try {
+      await axios.delete(`/api/orders/${orderId}`);
+      alert("Order deleted successfully!");
+      router.push("/admin/order"); // Redirect back to orders list
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete order.");
+    }
+  };
+
+  return (
+    <main className="space-y-6">
+
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <ListCheck />
+          <h1 className={`text-3xl font-semibold ${orbitron.className}`}>Orders Details</h1>
+        </div>
+      </div>
+
+
+      <div className="relative overflow-x-auto">
+        <table className="w-full border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          <tbody className="divide-y divide-gray-100">
+            <tr className="bg-gray-50 hover:bg-gray-100 transition">
+              <th className="px-6 py-3 text-left text-sm font-semibold bg-gray-200/40 text-gray-700">
+                Order ID
+              </th>
+              <td className="px-6 py-3 text-gray-900 text-sm">{order._id}</td>
+            </tr>
+            <tr className="hover:bg-gray-50 transition">
+              <th className="px-6 py-3 text-left text-sm font-semibold bg-gray-200/40 text-gray-700">
+                Customer Name
+              </th>
+              <td className="px-6 py-3 text-gray-900 text-sm">{order.customerName}</td>
+            </tr>
+            <tr className="bg-gray-50 hover:bg-gray-100 transition">
+              <th className="px-6 py-3 text-left text-sm font-semibold bg-gray-200/40 text-gray-700">
+                Address
+              </th>
+              <td className="px-6 py-3 text-gray-900 text-sm">{order.address}</td>
+            </tr>
+            <tr className="hover:bg-gray-50 transition">
+              <th className="px-6 py-3 text-left text-sm font-semibold bg-gray-200/40 text-gray-700">
+                Partner Name
+              </th>
+              <td className="md:px-6 px-4 py-3">
+                <input
+                  type="text"
+                  value={partner}
+                  onChange={(e) => setPartner(e.target.value)}
+                  className="md:w-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </td>
+            </tr>
+            <tr className="bg-gray-50 hover:bg-gray-100 transition">
+              <th className="px-6 py-3 text-left text-sm font-semibold bg-gray-200/40 text-gray-700">
+                Status
+              </th>
+              <td className="md:px-6 px-4 py-3">
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="md:w-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="assigned">Assigned</option>
+                  <option value="picked_up">Picked Up</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </td>
+            </tr>
+            <tr className="bg-gray-50 hover:bg-gray-100 transition">
+              <th className="px-6 py-3 text-left text-sm font-semibold bg-gray-200/40 text-gray-700">
+                Created At
+              </th>
+              <td className="px-6 py-3 text-gray-900 text-sm">{order.createdAt}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex gap-4 justify-end mt-4">
+        <button
+          onClick={handleUpdate}
+          className="px-3 flex border border-green-600 rounded text-green-600 items-center gap-2 py-1"
+        >
+          <Edit size={18} /> Update
+        </button>
+        <button
+          onClick={handleDelete}
+          className="px-3 py-1 bg-red-500 rounded text-white flex items-center gap-2 "
+        >
+          <Trash size={18} /> Delete
+        </button>
+      </div>
+
+
+      <OrderTracking order={order} />
+    </main >
+  );
+}

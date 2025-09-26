@@ -5,8 +5,8 @@ import { useState } from "react";
 import { ArrowRight, History, Home, Info, Menu, Settings, Tag, X } from "lucide-react";
 
 import { Orbitron } from 'next/font/google'
+import { usePartner } from "@component/app/context/authContext";
 const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" });
-
 
 const NavLink = ({
     href,
@@ -34,6 +34,8 @@ const NavLink = ({
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
 
+    const { partner } = usePartner()
+
     return (
         <nav className="bg-white shadow fixed top-0 left-0 right-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,7 +51,12 @@ export default function Navbar() {
                     </div>
 
                     <div className="hidden md:flex space-x-3">
-                        <button className="font-semi-bold text-sm">Sign in</button>
+                        {
+                            partner ?
+                                <span>{partner.split(",")[0]}</span>
+                                :
+                                <Link href={'/auth'} className="font-semi-bold text-sm">Sign in</Link>
+                        }
                         <Link href="/dashboard/settings" className="flex items-center justify-center gap-1 overflow-hidden font-medium transition duration-300 ease-[cubic-bezier(0.4,0.36,0,1)] rounded-md bg-gray-900 text-white ring-1 ring-gray-900 text-xs px-3 py-[0.1875rem]">
                             Start building
                             <ArrowRight size={12} />
