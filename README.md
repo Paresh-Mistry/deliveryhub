@@ -28,7 +28,6 @@ It offers **real-time order tracking, partner assignment, socket-based updates, 
 
 ### Backend
 - 🚀 [Express](https://fastapi.tiangolo.com/) / Next.js API routes  
-- 💾 [PostgreSQL](https://www.postgresql.org/) for relational data  
 - 🍃 [MongoDB](https://www.mongodb.com/) for flexible partner/order history  
 - 🔌 [Socket.IO](https://socket.io/) for WebSockets  
 
