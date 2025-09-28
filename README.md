@@ -61,6 +61,19 @@ deliveryhub/ </br>
 
 
 ---
+# 📂 Project Structure
+
+<img width="1917" height="867" alt="image" src="https://github.com/user-attachments/assets/23fe52f7-f1ae-429c-878e-6300ebcf97d9" />
+<img width="1917" height="870" alt="image" src="https://github.com/user-attachments/assets/a5f12746-1f6d-4c0b-9db4-f9df69c2bd28" />
+<img width="1917" height="865" alt="image" src="https://github.com/user-attachments/assets/54f5febe-e2cf-4cb2-8c4e-c991b10d77eb" />
+<img width="1902" height="872" alt="image" src="https://github.com/user-attachments/assets/85072add-4f80-4d3e-8610-fb7ea69f9678" />
+<img width="1898" height="867" alt="image" src="https://github.com/user-attachments/assets/3facd68e-d120-4689-910c-b58901006f11" />
+<div align="center">
+<img width="542" height="861" alt="image" src="https://github.com/user-attachments/assets/f1bba65a-8f19-423a-8f7a-55f958e4940d" />
+<img width="570" height="863" alt="image" src="https://github.com/user-attachments/assets/c6e5ddb2-813c-4730-9b64-f81274670e64" />
+</div>
+
+---
 
 ## 🚀 Getting Started
 
