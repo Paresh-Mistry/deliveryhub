@@ -1,6 +1,12 @@
-"use client"
-
 import Hero from "@component/components/common/Hero";
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'Admin | Order Details',
+  description: '...',
+}
+
 
 export default function Home() {
 
@@ -12,7 +18,3 @@ export default function Home() {
   );
 }
 
-// export const metadata = {
-//   title: "Home",
-//   description: "Using Next.js App Router",
-// };

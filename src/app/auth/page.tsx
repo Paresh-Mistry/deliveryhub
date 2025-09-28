@@ -3,7 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { usePartner } from "../context/authContext";
+import { usePartner } from "../context/AuthContext";
 
 export default function PartnerLogin() {
   const { login } = usePartner();
@@ -20,15 +20,27 @@ export default function PartnerLogin() {
     setError("");
 
     try {
-      const res = await axios.post("/api/partners/auth", { partnerName });
+      const res = await axios.post(
+        "/api/partners/auth/login",
+        { partnerName },
+        { withCredentials: true }
+      );
 
       console.log(res.data)
+      console.log(partnerName)
 
       if (res.data.success) {
         // use partnerName as fallback token if res.data.token is missing
         const token = res.data.token || `${partnerName}-token`;
+        const partnerData = {
+          _id: res.data.partner._id,
+          PartnerName: res.data.partner.PartnerName,
+          email: res.data.partner.emailId,
+          phone: res.data.partner.contactNo,
+          vehicleType: res.data.partner.vehicleType,
+        };
 
-        login(partnerName, token); // context login sets cookie + state
+        login(partnerData, token); // context login sets cookie + state
         console.log("Assigned Token:", token);
 
         setOpen(false);
@@ -49,7 +61,7 @@ export default function PartnerLogin() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-80">
         <h2 className="text-2xl font-semibold mb-4 text-center">Partner Login</h2>
         {error && <p className="text-red-500 text-sm mb-2">{error}</p>}

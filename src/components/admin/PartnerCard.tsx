@@ -4,8 +4,6 @@ import { Partner } from "../../types/index"
 
 export default function PartnerCard({ partners }: { partners: Partner[] }) {
 
-    console.log(partners)
-
     return (
         <>
             {partners?.map((partner: any) => (
@@ -23,10 +21,6 @@ export default function PartnerCard({ partners }: { partners: Partner[] }) {
                             <Phone size={15}/>
                             {partner.contactNo}
                         </span>
-                        <div className="flex justify-end gap-4">
-                            <button className=""><Edit size={16} /></button>
-                            <button className=""><Trash size={16} /></button>
-                        </div>
                     </div>
                 </div>
             ))}

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import clientPromise, { dbName } from "@component/lib/db";
 
+
+// Getting all Order for Admin Visibility
 export async function GET() {
   try {
     const client = await clientPromise;
@@ -18,6 +20,8 @@ export async function GET() {
   }
 }
 
+
+// Create Order
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -43,3 +47,18 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

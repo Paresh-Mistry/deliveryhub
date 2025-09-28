@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import clientPromise from "../../../../lib/db";
 import { NextResponse } from "next/server";
 
-
+// GEtting each order with parameter ID 
 export async function GET(req: Request, { params }: { params: { orderId: string } }) {
   try {
     const { orderId } = params;
@@ -24,8 +24,7 @@ export async function GET(req: Request, { params }: { params: { orderId: string 
 }
 
 
-// UPDATE order
-
+// UPDATE order 
 export async function PUT(req: Request, { params }: { params: { orderId: string } }) {
   try {
     const { orderId } = params;

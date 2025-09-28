@@ -2,27 +2,45 @@
 
 import axios from "axios";
 import { Edit, ListCheck, ListOrdered, Plus, Trash } from "lucide-react";
-import { Orbitron } from "next/font/google";
-import { useState } from "react";
+import { orbitron } from "@component/font/font";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { Partner } from "../../../types/index"
 import PartnerCard from "@component/components/admin/PartnerCard";
+import { useModal } from "@component/app/context/ModalContext";
+import Loader from "@component/components/common/Loader";
+import Error from "@component/components/common/error";
 
-
-const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" })
-
+// fetch data
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 export default function Page() {
 
+
+    useEffect(() => {
+        document.title = "Admin | Partners"
+    }, [])
+
+
+    // Retrive Order
     const {
         data: partners,
         mutate,
-        error
+        error,
+        isLoading,
     } = useSWR("/api/partners", fetcher)
 
 
+    const {
+        isOpen,
+        openModal,
+        closeModal
+    } = useModal()
+
+
+
+    // Create Partner at Admin
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -51,12 +69,9 @@ export default function Page() {
         }
     };
 
-    const [isOpen, setIsOpen] = useState(false);
+    if (!partners || isLoading) return <><Loader /></>;
+    if (error) return <><Error error={error} /></>;
 
-    const openModal = () => setIsOpen(true);
-    const closeModal = () => {
-        setIsOpen(false);
-    };
 
     return (
         <div className="space-y-4">

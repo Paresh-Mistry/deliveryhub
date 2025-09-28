@@ -1,82 +1,48 @@
 "use client";
+import useSWR from "swr";
+import axios from "axios";
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import Loader from "../common/Loader";
+import Error from "../common/error";
 
-import { useEffect, useState } from "react";
-
-interface Order {
-    _id: string;
-    customerName: string;
-    address: string;
-    statusHistory: { status: string; updatedAt: string }[];
-    createdAt: string;
-}
+const fetcher = (url: string) =>
+  axios.get(url, { withCredentials: true }).then(res => res.data);
 
 export default function PartnerOrders() {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
+  const { data:order, error, isLoading } = useSWR("/api/partners/orders", fetcher);
 
-    useEffect(() => {
-        async function fetchOrders() {
-            try {
-                const res = await fetch("/api/orders/partners", {
-                    method: "GET",
-                    credentials: "include", // include cookies
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    console.log(data)
-                    setOrders(data);
-                }
-            } catch (error) {
-                console.error("Error fetching partner orders:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
+  if (isLoading) return <div className="mt-3"><Loader/></div>;
+  if (error) return <><Error error={error}/></>;
 
-        fetchOrders();
-    }, []);
+  const orders = order?.orders ?? [];
 
-    if (loading) {
-        return <p className="text-center text-gray-500 mt-6">Loading orders...</p>;
-    }
-
-    if (orders.length === 0) {
-        return <p className="text-center text-gray-500 mt-6">No assigned orders.</p>;
-    }
-
-    return (
-        <>
-            {orders.map((order) => {
-                // const latestStatus =
-                //     order.statusHistory[order.statusHistory.length - 1];
-                return (
-                    <div
-                        key={order._id}
-                        className="bg-white shadow-md rounded-xl p-5 border border-gray-200 hover:shadow-lg transition-shadow"
-                    >
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                            {order.customerName}
-                        </h3>
-                        <p className="text-sm text-gray-600 mb-2">
-                            <span className="font-medium">Address:</span> {order.address}
-                        </p>
-                        <p className="text-sm text-gray-600 mb-2">
-                            <span className="font-medium">Created:</span>{" "}
-                            {new Date(order.createdAt).toLocaleDateString()}
-                        </p>
-                        {/* <p
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${latestStatus.status === "completed"
-                                    ? "bg-green-100 text-green-700"
-                                    : latestStatus.status === "pending"
-                                        ? "bg-yellow-100 text-yellow-700"
-                                        : "bg-blue-100 text-blue-700"
-                                }`}
-                        >
-                            {latestStatus.status.toUpperCase()}
-                        </p> */}
-                    </div>
-                );
-            })}
-        </>
-    );
+  return (
+    <>
+      {orders.length === 0 ? (
+        <div>No orders found.</div>
+      ) : (
+        orders.map((order: any, idx: number) => (
+          <div
+            key={order._id || idx}
+            className="p-4 relative border-l-3 border-blue-500 shadow bg-white hover:shadow-lg transition mb-4"
+          >
+            <div className="absolute top-0 right-0 py-1 px-2 text-xs mb-2">{idx + 1}</div>
+            <p className="text-sm text-gray-700 mb-4">
+              <span className="font-medium">Customer Name:</span>{" "}
+              {order.customerName || "Not Assigned"}
+            </p>
+            <div className="flex justify-between items-center">
+              <span className="text-sm px-2 rounded-2xl">
+                {order.statusHistory?.at(-1)?.status || "Not Assigned"}
+              </span>
+              <Link href={`/dashboard/partner/${order._id}`}>
+                <ArrowUpRight />
+              </Link>
+            </div>
+          </div>
+        ))
+      )}
+    </>
+  );
 }

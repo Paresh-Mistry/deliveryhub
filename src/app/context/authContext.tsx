@@ -1,45 +1,60 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
+interface Partner {
+  _id: string;
+  PartnerName: string;
+  email?: string;
+  phone?: string;
+  vehicleType?: string;
+}
+
 interface PartnerContextType {
-  partner: string | null;
-  login: (partnerName: string, token: string) => void;
+  partner: Partner | null;
+  login: (partner: Partner, token: string) => void;
   logout: () => void;
 }
 
+
 const PartnerContext = createContext<PartnerContextType>({
   partner: null,
-  login: () => {},
-  logout: () => {},
+  login: () => { },
+  logout: () => { },
 });
 
 export function PartnerProvider({ children }: { children: ReactNode }) {
-  const [partner, setPartner] = useState<string | null>(null);
+  const [partner, setPartner] = useState<Partner | null>(null);
 
-  // ✅ On mount, read partner name from cookies (or localStorage)
+  // On mount, restore partner name from localStorage
   useEffect(() => {
-    const cookies = document.cookie.split("; ").reduce((acc: any, c) => {
-      const [k, v] = c.split("=");
-      acc[k] = v;
-      return acc;
-    }, {});
-
-    const partnerName = localStorage.getItem("partnerName"); // save name also
-    if (cookies.partnerToken && partnerName) {
-      setPartner(partnerName);
+    const savedPartner = localStorage.getItem("partner");
+    if (savedPartner) {
+      setPartner(JSON.parse(savedPartner));
     }
+    console.log("Restored Partner from Storage: ", savedPartner)
   }, []);
 
-  const login = (partnerName: string, token: string) => {
-    setPartner(partnerName);
+  // Called when partner logs in successfully
+  const login = (partner: Partner, token: string) => {
+    setPartner(partner);
+
+    console.log("Logging in Partner : ", partner)
+
+    // persist only partnerName, not token (server already sets httpOnly cookie)
+    localStorage.setItem("partner", JSON.stringify(partner));
     document.cookie = `partnerToken=${token}; path=/`;
-    localStorage.setItem("partnerName", partnerName); // 🔑 persist name
+
   };
 
+  // Logout clears both state + storage
+  const router = useRouter()
   const logout = () => {
     setPartner(null);
-    document.cookie = "partnerToken=; max-age=0; path=/";
-    localStorage.removeItem("partnerName");
+    localStorage.removeItem("partner");
+    document.cookie = "partnerToken=; Max-Age=0; path=/";
+    fetch("/api/partners/auth/logout", { method: "POST" });
+    router.push("/auth");  // optional
   };
 
   return (

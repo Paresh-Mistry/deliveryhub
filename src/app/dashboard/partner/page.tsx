@@ -1,10 +1,18 @@
 "use client"
 
-import { orbitron } from "@component/app/admin/layout"
+import { orbitron } from "@component/font/font"
 import PartnerOrders from "@component/components/partner/PartnerOrder"
 import { ListCheck, Plus } from "lucide-react"
+import { useEffect } from "react"
+
 
 export default function Page() {
+
+
+  useEffect(() => {
+    document.title = "Partner | Assigned Orders"
+  }, [])
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -15,8 +23,7 @@ export default function Page() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {/* Pass all orders array to OrderCard */}
-        <PartnerOrders/>
+        <PartnerOrders />
       </div>
     </div>
   )

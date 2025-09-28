@@ -4,6 +4,7 @@ import type { Order } from "../../types/index"
 import Link from "next/link";
 
 export default function OrderCard({ orders }: { orders: Order[] }) {
+
     const getStatusClasses = (status: string) => {
         switch (status) {
             case "pending":
@@ -34,7 +35,9 @@ export default function OrderCard({ orders }: { orders: Order[] }) {
                         {order.partner || "Not Assigned"}
                     </p>
                     <div className="flex justify-between items-center">
-                        <span className={`text-sm px-2 rounded-2xl ${getStatusClasses(order.statusHistory?.at(-1)['status'])}`}>{order.statusHistory?.at(-1)['status'] || "Not Assigned"}</span>
+                        <span className={`text-sm px-2 rounded-2xl ${getStatusClasses(order.statusHistory?.at(-1)?.status + "")}`}>
+                            {order.statusHistory?.at(-1)?.status || "Not Assigned"}
+                        </span>
                         <Link href={`/admin/order/${order._id}`}>
                             <ArrowUpRight />
                         </Link>

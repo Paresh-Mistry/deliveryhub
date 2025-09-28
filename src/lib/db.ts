@@ -1,14 +1,26 @@
-// lib/db.ts
 import { MongoClient } from "mongodb";
+
+/*
+Processing environment variables for mongo DB connection
+*/
 
 const uri = process.env.MONGODB_URI!;
 const dbName = process.env.MONGODB_DB! || "deliveryhub";
 
-if (!uri) throw new Error("❌ Please define MONGODB_URI in .env.local");
+
+
+if (!uri) {
+  throw new Error("Please define MONGODB_URI in .env.local");
+}
+
 
 let client: MongoClient;
+
+// Resolve Promise for MongoClient 
 let clientPromise: Promise<MongoClient>;
 
+
+// Development mode
 if (process.env.NODE_ENV === "development") {
   if (!(global as any)._mongoClientPromise) {
     client = new MongoClient(uri, {
@@ -24,6 +36,8 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
+
+
 /**
  * Debug function: lists all collections in development
  */
@@ -33,10 +47,10 @@ async function debugConnection() {
     const db = client.db(dbName);
     const collections = await db.listCollections().toArray();
 
-    console.log(`✅ Connected to MongoDB: ${dbName}`);
-    console.log("📂 Collections:", collections.map(c => c.name));
+    console.log(`Connected to MongoDB: ${dbName}`);
+    console.log("Collections:", collections.map(c => c.name));
   } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
+    console.error("MongoDB connection error:", err);
   }
 }
 

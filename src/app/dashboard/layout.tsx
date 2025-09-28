@@ -1,14 +1,13 @@
 "use client";
 
-import { History, Home, Info, Menu, Settings, Tag } from "lucide-react";
+import { ChevronRight, Home, Info, LogOut, MapPin, Menu, Tag, User } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@component/components/common/Navbar";
-import { useState } from "react";
-
-import { Orbitron } from 'next/font/google'
-import { usePartner } from "../context/authContext";
-const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" })
-
+import { useEffect, useState } from "react";
+import { usePartner } from "../context/AuthContext";
+import { orbitron } from "@component/font/font";
+import NextBreadcrumb from "@component/components/common/NextBreadCrumb";
+import { Metadata } from "next";
 
 const SidebarLink = ({
     href,
@@ -37,7 +36,12 @@ const SidebarLink = ({
 export default function Sidebarlayout({ children }: { children: React.ReactNode }) {
     const [isOpen, setIsOpen] = useState(false);
 
-    const {partner} = usePartner()
+    const { partner, logout } = usePartner()
+
+    useEffect(() => {
+      document.title = "Partner | Profile"
+    }, [])
+    
 
     return (
         <>
@@ -52,7 +56,7 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
                         <Link href={'/'} className={`${orbitron.className} text-lg font-semibold italic text-blue-600`}>
                             {isOpen && "Deliveryhub"}
                         </Link>
-                        <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
+                        <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none bg-blue-100 p-2 rounded-full">
                             <Menu size={20} />
                         </button>
                     </div>
@@ -77,27 +81,42 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
 
                         <nav className="mt-3 space-y-1">
                             <SidebarLink icon={<Tag />} label="Assignment " isOpen={isOpen} href={'/dashboard/partner'} />
-                            <SidebarLink icon={<Settings />} label="Settings" isOpen={isOpen} href={'/dashboard/settings'} />
+                            <SidebarLink icon={<MapPin />} label="Tracking" isOpen={isOpen} href={'/dashboard/partner/map'} />
+                            <SidebarLink icon={<User />} label={partner ? partner.PartnerName : 'Sign In'} isOpen={isOpen} href={partner ? '/dashboard/settings' : '/auth'} />
+                            {
+                                partner
+                                && (
+                                    <button
+                                        onClick={() => logout()}
+                                        className={`flex gap-3 items-center ${!isOpen && 'justify-center rounded-full'} px-4 py-2 hover:bg-gray-200 w-full transition rounded-r-full cursor-pointer`}
+                                    >
+                                        <LogOut />
+                                        {isOpen && <span className="text-sm">Logout</span>}
+                                    </button>
+                                )
+                            }
                         </nav>
                     </div>
 
-                </aside>
+                </aside >
 
                 {/* Main Content */}
-                <section className="bg-gray-50 md:px-8 px-4 py-4 md:py-5">
-                    <div className="flex justify-end items-center">
- {
-                            partner ?
-                                <span>{partner.split(",")[0]}</span>
-                                :
-                                <Link href={'/auth'} className="font-semi-bold text-sm">Sign in</Link>
-                        }                    </div>
-
-                    <div className="mt-4">
+                < section className="bg-gray-50 md:px-8 px-4 py-4 md:py-5" >
+                    <div className="flex justify-between items-center">
+                        <NextBreadcrumb
+                            homeElement="Home"
+                            separator={<ChevronRight size={13} />}
+                            activeClasses="text-blue-500 text-xs"
+                            containerClasses="flex text-xs items-center gap-2"
+                            listClasses="hover:underline"
+                            capitalizeLinks
+                        />
+                    </div>
+                    <div className="mt-5">
                         {children}
                     </div>
-                </section>
-            </div>
+                </section >
+            </div >
         </>
     );
 }

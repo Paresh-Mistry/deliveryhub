@@ -4,12 +4,10 @@ import Navbar from "@component/components/common/Navbar";
 import { ChevronRight, History, Home, Info, Menu, Settings, Tag, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import image from "../../../public/globe.svg"
-
-import { Orbitron } from 'next/font/google'
+import image from "../../../public/AdminDummy.jpg"
 import Image from "next/image";
-
-export const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" })
+import { orbitron } from "@component/font/font";
+import NextBreadcrumb from "@component/components/common/NextBreadCrumb";
 
 const SidebarLink = ({
     href,
@@ -36,7 +34,8 @@ const SidebarLink = ({
 
 
 export default function Sidebarlayout({ children }: { children: React.ReactNode }) {
-    const [isOpen, setIsOpen] = useState(true);
+
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
@@ -56,13 +55,14 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
                         </button>
                     </div>
 
-                    {isOpen && <div className="my-4">
+                    {isOpen && <div className="flex justify-center flex-col items-center gap-y-2 mb-2">
                         <Image
-                            className="rounded-full border mx-auto"
+                            className="rounded-full border"
                             width={100}
                             height={100}
                             alt=""
-                            src={image}/>
+                            src={image} />
+                        <span className="text-sm">Admin</span>
                     </div>}
 
                     <div>
@@ -80,11 +80,10 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
 
                     <div className="mt-5">
                         {isOpen && <div className="px-4">
-                            <h5 className="text-xs">View List</h5>
+                            <h5 className="text-xs">Records</h5>
                         </div>}
 
                         <nav className="mt-3 space-y-1">
-                            <SidebarLink icon={<User />} label="Profile" isOpen={isOpen} href={'/admin/'} />
                             <SidebarLink icon={<Tag />} label="Partners " isOpen={isOpen} href={'/admin/partners'} />
                             <SidebarLink icon={<History />} label="Orders " isOpen={isOpen} href={'/admin/order'} />
                         </nav>
@@ -94,10 +93,16 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
 
                 {/* Main Content */}
                 <section className="bg-gray-50 md:px-8 px-4 py-4 md:py-5">
-                    <div className="flex justify-end items-center">
-                        <Link href={''} className="md:block hidden border border-blue-300 px-2 rounded-2xl text-xs py-1">SignIn</Link>
+                      <div className="flex justify-between items-center">
+                        <NextBreadcrumb
+                            homeElement="Home"
+                            separator={<ChevronRight size={13} />}
+                            activeClasses="text-blue-500 text-xs"
+                            containerClasses="flex text-xs items-center gap-2"
+                            listClasses="hover:underline"
+                            capitalizeLinks
+                        />
                     </div>
-
                     <div className="mt-5">
                         {children}
                     </div>

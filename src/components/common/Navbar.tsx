@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, History, Home, Info, Menu, Settings, Tag, X } from "lucide-react";
+import { ArrowRight, History, Home, Info, LogOut, Menu, Settings, Tag, User, X } from "lucide-react";
 
 import { Orbitron } from 'next/font/google'
-import { usePartner } from "@component/app/context/authContext";
-const orbitron = Orbitron({ subsets: ["latin"], weight: '400', variable: "--font-inter" });
+import { usePartner } from "@component/app/context/AuthContext";
+import { orbitron, raleway } from "@component/font/font";
 
 const NavLink = ({
     href,
@@ -22,7 +22,7 @@ const NavLink = ({
     return (
         <Link
             href={href}
-            className={`flex gap-3 items-center ${!isOpen && 'justify-center rounded-full'} hover:bg-gray-200 transition rounded-r-full cursor-pointer`}
+            className={`flex gap-3 py-2 px-4 items-center ${!isOpen && 'justify-center rounded-full'} hover:bg-gray-200 transition rounded-r-full cursor-pointer`}
         >
             <div className="">{icon}</div>
             {isOpen && <span className="text-sm">{label}</span>}
@@ -34,7 +34,7 @@ const NavLink = ({
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
 
-    const { partner } = usePartner()
+    const { partner, logout } = usePartner()
 
     return (
         <nav className="bg-white shadow fixed top-0 left-0 right-0 z-50">
@@ -53,12 +53,15 @@ export default function Navbar() {
                     <div className="hidden md:flex space-x-3">
                         {
                             partner ?
-                                <span>{partner.split(",")[0]}</span>
+                                <span className="flex items-center justify-center gap-1">
+                                    <User size={15} />
+                                    <span className={`text-sm ${raleway.className}`}>{partner.PartnerName}</span>
+                                </span>
                                 :
                                 <Link href={'/auth'} className="font-semi-bold text-sm">Sign in</Link>
                         }
                         <Link href="/dashboard/settings" className="flex items-center justify-center gap-1 overflow-hidden font-medium transition duration-300 ease-[cubic-bezier(0.4,0.36,0,1)] rounded-md bg-gray-900 text-white ring-1 ring-gray-900 text-xs px-3 py-[0.1875rem]">
-                            Start building
+                            Start Smarter
                             <ArrowRight size={12} />
                         </Link>
                     </div>
@@ -85,19 +88,33 @@ export default function Navbar() {
                         <X size={24} />
                     </button>
                 </div>
-                <div className="px-6 py-4 space-y-3">
-                    <div className="text-xs">Menu</div>
-                    <div className="space-y-3">
+                <div className="space-y-3 mt-4">
+                    <div className="text-xs px-4">Menu</div>
+                    <div className="">
                         <NavLink icon={<Home />} label="Home" isOpen={isOpen} href={'/'} />
                         <NavLink icon={<Info />} label="About " isOpen={isOpen} href={'/'} />
                     </div>
                 </div>
-                <div className="px-6 py-4 space-y-3">
-                    <div className="text-xs">Getting Started</div>
-                    <div className="space-y-3">
+                <div className="space-y-3 mt-4">
+                    <div className="text-xs px-4">Getting Started</div>
+                    <div className="">
+
                         <NavLink icon={<Tag />} label="Products " isOpen={isOpen} href={'/dashboard/partner'} />
                         <NavLink icon={<History />} label="History " isOpen={isOpen} href={'/'} />
-                        <NavLink icon={<Settings />} label="Settings" isOpen={isOpen} href={'eengine'} />
+                        <NavLink icon={partner ? <User /> : <Settings />} label={partner ? partner.PartnerName : "SignIn"} isOpen={isOpen} href={partner ? '/dashboard/settings' : '/auth'} />
+                        {
+                            partner
+                            && (
+                                <button
+                                    onClick={() => logout()}
+                                    className={`flex gap-3 items-center py-2 px-4 ${!isOpen && 'justify-center rounded-full'} hover:bg-gray-200 w-full transition rounded-r-full cursor-pointer`}
+                                >
+                                    <LogOut />
+                                    {isOpen && <span className="text-sm">Logout</span>}
+                                </button>
+                            )
+                        }
+
                     </div>
                 </div>
             </div>

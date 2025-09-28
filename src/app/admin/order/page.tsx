@@ -3,34 +3,49 @@
 import OrderCard from "@component/components/admin/OrderCard";
 import { Order } from "@component/types";
 import { ListCheck, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import useSWR from "swr";
-import { orbitron } from "../layout";
+import { orbitron } from "@component/font/font";
+import { useModal } from "@component/app/context/ModalContext";
+import Loader from "@component/components/common/Loader";
+import Error from "@component/components/common/error";
 
+// fetching data from API
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
+
 
 export default function Page() {
 
+    useEffect(() => {
+        document.title = "Admin | Orders"
+    }, [])
+
+
+    const {
+        data: partners
+    } = useSWR("/api/partners", fetcher)
+
+    // Retriving Orders Details
     const {
         data: orders,
         mutate,
-        error
+        error,
+        isLoading,
     } = useSWR<Order[]>("/api/orders", fetcher);
 
 
-    console.log(orders)
+    const {
+        isOpen,
+        message,
+        setMessage,
+        openModal,
+        closeModal
+    } = useModal()
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [message, setMessage] = useState("");
 
-    const openModal = () => setIsOpen(true);
-    const closeModal = () => {
-        setIsOpen(false);
-        setMessage("");
-    };
-
+    // Creating Order at Admin 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -41,8 +56,10 @@ export default function Page() {
             customerName: formData.get("customerName") as string,
             address: formData.get("address") as string,
             partner: partnerName ? (partnerName as string) : null,
-            status: formData.get("status") as string,
-        };
+            statusHistory: [{ status: formData.get("status") as string, updatedAt: new Date().toISOString() }],
+            createdAt: new Date().toISOString(),
+            PartnerData: []
+        }
 
         try {
             const res = await axios.post("/api/orders", newOrder);
@@ -60,8 +77,8 @@ export default function Page() {
         }
     };
 
-    if (!orders) return <p>Loading orders...</p>;
-    if (error) return <p>Error while Loading orders...</p>;
+    if (!orders || isLoading) return <><Loader /></>;
+    if (error) return <><Error error={error} /></>;
 
     return (
         <>
@@ -113,11 +130,18 @@ export default function Page() {
                             </div>
                             <div>
                                 <label className="block mb-1 font-medium">Partner Name</label>
-                                <input
-                                    type="text"
+                                <select
                                     name="partner"
+                                    required
                                     className="w-full border border-gray-300 rounded px-3 py-2"
-                                />
+                                >
+                                    {partners.map((part: any, idx: number) => (
+                                        <option key={idx} value={part.PartnerName}>
+                                            {part.PartnerName}
+                                        </option>
+                                    ))}
+                                </select>
+
                             </div>
                             <div>
                                 <label className="block mb-1 font-medium">Status</label>

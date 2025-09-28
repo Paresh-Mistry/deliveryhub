@@ -7,39 +7,33 @@ import { useRouter } from "next/navigation";
 import { Edit, ListCheck, Trash } from "lucide-react";
 import { Order } from "../../../../types/index"
 import OrderTracking from "@component/components/admin/OrderTracking";
-import { orbitron, raleway } from "@component/font/font";
+import { montserrat, orbitron } from "@component/font/font";
 import MiniMap from "@component/components/admin/MapContainer";
 import Loader from "@component/components/common/Loader";
 
-
-// Fetching Data from API
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
-
 
 
 export default function AdminOrderPage({ params }: { params: { orderId: string } }) {
 
 
   useEffect(() => {
-    document.title = "Admin | Order Details"
+    document.title = "Partner | Orders Details"
   }, [])
 
 
-  // Retriving Parameters
   const unwrappedparams = React.use(params)
   const { orderId } = unwrappedparams;
-
-
   const router = useRouter();
-  const { data: order, mutate, isLoading } = useSWR<Order>(`/api/orders/${orderId}`, fetcher);
+  const { data: order, mutate, error, isLoading } = useSWR<Order>(`/api/orders/${orderId}`, fetcher);
 
-  const [status, setStatus] = useState(order?.statusHistory[order.statusHistory.length - 1]?.status || "pending");
+  const [status, setStatus] = useState(
+    order?.statusHistory?.[order.statusHistory.length - 1]?.status || "pending"
+  );
   const [partner, setPartner] = useState(order?.partner);
 
   if (!order || isLoading) return <><Loader /></>;
 
-
-  // Update STAtus & Partner Name at Admin Side 
   const handleUpdate = async () => {
     try {
       const res = await axios.put(`/api/orders/${orderId}`, { status, partner });
@@ -51,19 +45,6 @@ export default function AdminOrderPage({ params }: { params: { orderId: string }
     }
   };
 
-
-  // Delete Order at Admin SIde
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete tdis order?")) return;
-    try {
-      await axios.delete(`/api/orders/${orderId}`);
-      alert("Order deleted successfully!");
-      router.push("/admin/order"); // Redirect back to orders list
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete order.");
-    }
-  };
 
   return (
     <main className="space-y-6">
@@ -144,18 +125,14 @@ export default function AdminOrderPage({ params }: { params: { orderId: string }
         >
           <Edit size={18} /> Update
         </button>
-        <button
-          onClick={handleDelete}
-          className="px-3 py-1 bg-red-500 rounded text-white flex items-center gap-2 "
-        >
-          <Trash size={18} /> Cancel
-        </button>
       </div>
 
-      <div>
-        <h2 className={`${raleway.className}`}>Tracking Partner</h2>
+
+      <div className="mb-8 space-y-4">
+        <h2 className={`${montserrat.className} font-bold`}>Tracking Partner</h2>
+        <MiniMap address={order.address} />
       </div>
-      <MiniMap address={order.address} />
+
 
       <OrderTracking order={order} />
     </main >
