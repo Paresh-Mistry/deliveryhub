@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, History, Home, Info, LogOut, Menu, Settings, Tag, User, X } from "lucide-react";
-
-import { Orbitron } from 'next/font/google'
 import { usePartner } from "@component/app/context/AuthContext";
 import { orbitron, raleway } from "@component/font/font";
 
@@ -44,9 +42,10 @@ export default function Navbar() {
                         <div className="text-[18px] font-bold tracking-wide">
                             <Link href={'/'} className={`${orbitron.className} text-blue-600 font-semibold italic`}>Deliveryhub</Link>
                         </div>
-                        <div className="hidden md:flex gap-5">
+                        <div className={`hidden md:flex gap-5 ${raleway.className}`}>
                             <Link href="/" className="text-sm hover:text-blue-500 transition">Home</Link>
-                            <Link href="/about" className="text-sm hover:text-blue-500 transition">Order</Link>
+                            
+                            <Link href="/dashboard/partner" className="text-sm hover:text-blue-500 transition">Assigns</Link>
                         </div>
                     </div>
 

@@ -16,7 +16,6 @@ import Loader from "@component/components/common/Loader";
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 
-
 export default function AdminOrderPage({ params }: { params: { orderId: string } }) {
 
 

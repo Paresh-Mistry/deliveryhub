@@ -50,7 +50,9 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
                         <Link href={'/'} className={`${orbitron.className} text-lg font-semibold italic text-blue-600`}>
                             {isOpen && "Deliveryhub"}
                         </Link>
-                        <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none p-2 rounded-full">
+                        <button onClick={() => setIsOpen(!isOpen)}
+                            className="focus:outline-none bg-blue-100 p-2 rounded-full"
+                        >
                             <Menu size={20} />
                         </button>
                     </div>
@@ -93,7 +95,7 @@ export default function Sidebarlayout({ children }: { children: React.ReactNode 
 
                 {/* Main Content */}
                 <section className="bg-gray-50 md:px-8 px-4 py-4 md:py-5">
-                      <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center">
                         <NextBreadcrumb
                             homeElement="Home"
                             separator={<ChevronRight size={13} />}
