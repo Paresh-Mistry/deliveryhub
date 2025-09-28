@@ -37,6 +37,10 @@ It offers **real-time order tracking, partner assignment, socket-based updates, 
 - 🧹 ESLint + Prettier for clean code  
 
 ---
+# 📂 Video Link 
+
+[Assignment Video](https://drive.google.com/file/d/1kNoA8hMgYKf1udzdGSmAy4nGpShH1D5X/view?usp=drive_link)
+---
 
 # 📂 Project Structure
 
